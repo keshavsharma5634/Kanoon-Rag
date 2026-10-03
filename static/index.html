@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kanoon-RAG — Income Tax Assistant</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --ink: #16302B;
+        --ink-light: #23473F;
+        --paper: #F6F3EA;
+        --panel: #FFFFFF;
+        --brass: #A87C3F;
+        --text: #1F2420;
+        --muted: #6B6A62;
+        --border: #E4DFD0;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body { height: 100%; }
+
+    body {
+        font-family: 'Inter', -apple-system, sans-serif;
+        background: var(--paper);
+        color: var(--text);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    /* Header */
+    header {
+        background: var(--ink);
+        color: #F6F3EA;
+        padding: 22px 32px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-shrink: 0;
+        position: relative;
+        overflow: hidden;
+        animation: header-in 0.6s ease-out;
+    }
+
+    header::before {
+        content: "§ § § § § § § § § § § § § § § §";
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        transform: translateY(-50%);
+        font-size: 42px;
+        letter-spacing: 18px;
+        color: rgba(246, 243, 234, 0.04);
+        white-space: nowrap;
+        pointer-events: none;
+    }
+
+    .brand { position: relative; z-index: 1; }
+
+    .brand h1 {
+        font-family: 'Source Serif 4', serif;
+        font-size: 24px;
+        font-weight: 600;
+        letter-spacing: 0.2px;
+    }
+
+    .brand p {
+        font-size: 13px;
+        color: rgba(246, 243, 234, 0.7);
+        margin-top: 3px;
+    }
+
+    .scope-tag {
+        position: relative;
+        z-index: 1;
+        font-size: 12px;
+        color: var(--paper);
+        border: 1px solid rgba(246, 243, 234, 0.3);
+        padding: 6px 12px;
+        border-radius: 20px;
+        white-space: nowrap;
+    }
+
+    /* Chat area */
+    main {
+        flex: 1;
+        overflow-y: auto;
+        display: flex;
+        justify-content: center;
+    }
+
+    .thread {
+        width: 100%;
+        max-width: 760px;
+        padding: 32px 24px 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
+
+    .row { display: flex; animation: msg-in 0.25s ease-out; }
+    .row.user { justify-content: flex-end; }
+    .row.bot { justify-content: flex-start; }
+
+    .bubble {
+        max-width: 78%;
+        padding: 14px 18px;
+        border-radius: 14px;
+        line-height: 1.6;
+        font-size: 15px;
+        white-space: pre-wrap;
+    }
+
+    .row.user .bubble {
+        background: var(--ink);
+        color: var(--paper);
+        border-bottom-right-radius: 4px;
+    }
+
+    .row.bot .bubble {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        color: var(--text);
+        border-bottom-left-radius: 4px;
+    }
+
+    .typing { display: inline-flex; gap: 4px; padding: 4px 0; }
+
+    .typing span {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--muted);
+        animation: pulse 1.2s infinite ease-in-out;
+    }
+
+    .typing span:nth-child(2) { animation-delay: 0.15s; }
+    .typing span:nth-child(3) { animation-delay: 0.3s; }
+
+    /* Input bar */
+    .input-bar {
+        border-top: 1px solid var(--border);
+        background: var(--panel);
+        padding: 16px 24px;
+        display: flex;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .input-inner {
+        width: 100%;
+        max-width: 760px;
+        display: flex;
+        gap: 10px;
+    }
+
+    input[type="text"] {
+        flex: 1;
+        padding: 13px 16px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        font-size: 15px;
+        font-family: inherit;
+        background: var(--paper);
+        color: var(--text);
+    }
+
+    input[type="text"]:focus { outline: none; border-color: var(--brass); }
+
+    button {
+        background: var(--ink);
+        color: var(--paper);
+        border: none;
+        padding: 0 22px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        font-family: inherit;
+    }
+
+    button:hover:not(:disabled) { background: var(--ink-light); }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .disclaimer {
+        text-align: center;
+        font-size: 11px;
+        color: var(--muted);
+        padding: 10px 24px 16px;
+        flex-shrink: 0;
+    }
+
+    @keyframes header-in {
+        from { opacity: 0; transform: translateY(-8px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes msg-in {
+        from { opacity: 0; transform: translateY(6px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulse {
+        0%, 60%, 100% { opacity: 0.3; transform: scale(0.85); }
+        30% { opacity: 1; transform: scale(1); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        * { animation: none !important; }
+    }
+
+    @media (max-width: 600px) {
+        header { padding: 16px 18px; }
+        .brand h1 { font-size: 19px; }
+        .scope-tag { display: none; }
+        .thread { padding: 20px 14px 16px; }
+        .input-bar { padding: 12px 14px; }
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <div class="brand">
+        <h1>Kanoon-RAG</h1>
+        <p>Answers grounded in the Income-tax Act, 2025</p>
+    </div>
+    <div class="scope-tag">6 Key Sections</div>
+</header>
+
+<main>
+    <div class="thread" id="thread">
+        <div class="row bot">
+    <div class="bubble">Hello. I can help you with common income tax questions under the Income-tax Act, 2025, covering:
+
+- Section 123 — Life insurance, PF & investment deductions
+- Section 126 — Health insurance premium deduction
+- Section 129 — Education loan interest deduction
+- Section 130 — Home loan interest deduction
+- Section 133 — Donations
+- Section 153 — Interest on savings deposits
+
+Ask me anything within these topics.</div>
+</div>
+    </div>
+</main>
+
+<div class="input-bar">
+    <div class="input-inner">
+        <input type="text" id="userInput" placeholder="Type your question..." onkeypress="if(event.key==='Enter') sendMessage()">
+        <button id="sendBtn" onclick="sendMessage()">Send</button>
+    </div>
+</div>
+<div class="disclaimer">This tool is for informational purposes only and is not a substitute for professional tax advice.</div>
+
+<script>
+const thread = document.getElementById('thread');
+const chatArea = document.querySelector('main');
+const input = document.getElementById('userInput');
+const sendBtn = document.getElementById('sendBtn');
+
+function scrollToBottom() {
+    chatArea.scrollTop = chatArea.scrollHeight;
+}
+
+function addRow(role, contentHTML) {
+    const row = document.createElement('div');
+    row.className = `row ${role}`;
+    row.innerHTML = `<div class="bubble">${contentHTML}</div>`;
+    thread.appendChild(row);
+    scrollToBottom();
+    return row;
+}
+
+async function sendMessage() {
+    const query = input.value.trim();
+    if (!query) return;
+
+    addRow('user', query);
+    input.value = '';
+    sendBtn.disabled = true;
+
+    const loadingRow = addRow('bot', '<div class="typing"><span></span><span></span><span></span></div>');
+
+    try {
+        const response = await fetch('/ask', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query })
+        });
+        const data = await response.json();
+        loadingRow.querySelector('.bubble').textContent = data.answer;
+    } catch (err) {
+        loadingRow.querySelector('.bubble').textContent = 'Something went wrong. Please try again.';
+    }
+
+    sendBtn.disabled = false;
+    scrollToBottom();
+}
+</script>
+
+</body>
+</html>

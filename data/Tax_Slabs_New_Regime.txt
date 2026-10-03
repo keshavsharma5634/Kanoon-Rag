@@ -1,0 +1,27 @@
+Income Tax Slabs — New Tax Regime (Section 115BAC)
+
+Section Number: 115BAC
+Act: Income-tax Act, 2025
+...
+
+Section 115BAC, also known as the New Tax Regime, is the default tax 
+regime applicable from Assessment Year 2026-27. Under Section 115BAC, 
+the income tax slabs for individual taxpayers are as follows:
+
+Income up to Rs 4,00,000: Nil (no tax)
+Income from Rs 4,00,001 to Rs 8,00,000: 5%
+Income from Rs 8,00,001 to Rs 12,00,000: 10%
+Income from Rs 12,00,001 to Rs 16,00,000: 15%
+Income from Rs 16,00,001 to Rs 20,00,000: 20%
+Income from Rs 20,00,001 to Rs 24,00,000: 25%
+Income above Rs 24,00,000: 30%
+
+A standard deduction of Rs 75,000 is available to salaried individuals 
+under this regime.
+
+Under Section 87A, a tax rebate of up to Rs 60,000 is available, which 
+effectively means individuals with taxable income up to Rs 12,00,000 pay 
+no tax after the rebate is applied.
+
+The New Tax Regime is the default regime. Taxpayers who wish to use the 
+Old Tax Regime must explicitly opt for it.

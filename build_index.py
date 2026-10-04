@@ -57,9 +57,6 @@ def remove_file_chunks(filename):
     collection.delete(where={"source": filename})
 
 
-# ============================================
-# Main logic
-# ============================================
 stored_hashes = load_stored_hashes()
 current_files = [f for f in os.listdir(DATA_DIR) if f.endswith(".txt")]
 

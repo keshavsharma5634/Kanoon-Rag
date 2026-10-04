@@ -91,7 +91,10 @@ Answer:"""
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0
             )
-            return response.choices[0].message.content
+            answer = response.choices[0].message.content
+            if not answer or not answer.strip():
+                raise ValueError("Empty response from model")
+            return answer
         except Exception as e:
             print(f"Attempt {attempt + 1} failed: {e}")
             if attempt < max_retries - 1:

@@ -294,11 +294,10 @@ async function sendMessage() {
             body: JSON.stringify({ query })
         });
         const data = await response.json();
-        loadingRow.querySelector('.bubble').textContent = data.answer;
+        loadingRow.querySelector('.bubble').textContent = data.answer || 'No response received. Please try asking again.';
     } catch (err) {
         loadingRow.querySelector('.bubble').textContent = 'Something went wrong. Please try again.';
     }
-
     sendBtn.disabled = false;
     scrollToBottom();
 }
